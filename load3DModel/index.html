@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        html, body{
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+        canvas{
+            border: 1px solid black;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin: -250px 0 0 -480px; 
+        }
+    </style>
+</head>
+<body>
+    <!-- <script src="three.min.js"></script>
+    <script src="GLTFLoader.js"></script> -->
+    <canvas>
+        <script type="module">
+            import * as THREE from 'https://cdn.skypack.dev/three@^0.135.0';
+            import threeDragcontrols from 'https://cdn.skypack.dev/three-dragcontrols';
+            import {GLTFLoader} from 'https://cdn.skypack.dev/three@^0.135.0/examples/jsm/loaders/GLTFLoader.js';
+            
+            let scene, camera, renderer;
+            
+            function init(){
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0xdddddd);
+
+                camera = new THREE.PerspectiveCamera(40,window.innerWidth/window.innerHeight, 1, 5000);
+                camera.rotation.x = -15/180*Math.PI;
+                camera.position.x = 9;
+                camera.position.y = -9;
+                camera.position.z = 2;
+
+                renderer = new THREE.WebGLRenderer({antialias:true});
+                renderer.setSize(window.innerWidth/2, window.innerHeight/2);
+                document.body.appendChild(renderer.domElement);
+
+
+                const light = new THREE.DirectionalLight(0xffffff,50);
+                light.position.set(2,2,10)
+                scene.add(light);
+
+                const light1 = new THREE.PointLight(0xffffff,1,100);
+                light1.position.set(-10,-11,10)
+                scene.add(light1);
+
+
+                let loader = new GLTFLoader();
+                loader.load('images/scene.gltf',function(gltf){
+                    console.log(gltf)
+                    let car = gltf.scene;
+                    // car.scale.set(0.5,0.5,0.1);
+                    car.position.x = -0.5
+                    car.position.y = -0.5
+                    car.position.z = 0
+                    car.rotation.y = 180/180*Math.PI
+                    scene.add(car);
+                    renderer.render(scene,camera);
+                },function(xhr){
+                    console.log((xhr.loaded/xhr.total * 100)+"% loaded")
+                },function(error){
+                    console.log("an error occurred")
+                });
+
+                
+                
+
+                // const geometry = new THREE.BoxGeometry(1,1,1)
+                // const material = new THREE.MeshBasicMaterial({
+                //     color: 0x00ff00
+                // })
+                // const boxMesh = new THREE.Mesh(geometry,material)
+                // scene.add(boxMesh)
+                // renderer.render(scene, camera)
+
+                // renderer.render(scene,camera);
+                // var controls = new threeDragcontrols(car, camera, renderer.domElement);
+                // document.body.appendChild(renderer.domElement);
+
+                // controls.addEventListener('dragstart',function(event){});
+                // controls.removeEventListener('dragend',function(event){});
+
+            }
+
+            init();
+
+            
+        </script>
+    </canvas>
+</body>
+</html>
