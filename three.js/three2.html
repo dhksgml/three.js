@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My first three.js app</title>
+    <style>
+        body{ 
+            margin: 0;
+        }
+        canvas{
+            display: block;
+        }
+
+        /* #info{
+            position:absolute;
+            top:10px;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+            display: block;
+            color: white;
+        } */
+    </style>
+</head>
+<body>
+    
+    <script type="module">
+        // import * as THREE from 'https://cdn.skypack.dev/three@^0.135.0';
+        
+        //회전하는 정육면체
+        // const scene = new THREE.Scene();
+        // const camera = new THREE.PerspectiveCamera(75,window.innerWidth/
+        //     window.innerHeight, 0.1, 1000);
+        // const renderer = new THREE.WebGLRenderer();
+        // renderer.setSize(window.innerWidth/2, window.innerHeight/2);
+        // document.body.appendChild(renderer.domElement);
+
+        // const geometry = new THREE.BoxGeometry(1,1,1);
+        // const material = new THREE.MeshBasicMaterial({color:0x00ff00});
+        // const cube = new THREE.Mesh(geometry,material);
+        // scene.add(cube);
+
+        // camera.position.z = 5;
+
+        // const animate = function() {
+        //     requestAnimationFrame(animate);
+
+        //     cube.rotation.x += 0.01;
+        //     cube.rotation.y += 0.01;
+
+        //     renderer.render(scene,camera);
+        // };
+
+        // animate();
+
+        // var controls = new THREE.DragControls([cube], camera, renderer.domElement);
+        // document.body.appendChild(renderer.domElement);
+
+        // controls.addEventListener('dragstart', function(event){
+        // });
+
+        // controls.removeEventListener('dragend',function(event){
+        // });
+        //선 그리기
+        // const renderer = new THREE.WebGLRenderer();
+        // renderer.setSize(window.innerWidth, window.innerHeight);
+        // document.body.appendChild(renderer.domElement);
+
+        // const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 1, 500);
+        // camera.position.set(0,0,100);
+        // camera.lookAt(0,0,0);
+
+        // const scene = new THREE.Scene();
+
+        // const material = new THREE.LineBasicMaterial( {color:0x0000ff});
+
+        // const points = [];
+        // points.push(new THREE.Vector3(-10,0,0));
+        // points.push(new THREE.Vector3(0,10,0));
+        // points.push(new THREE.Vector3(10,0,0));
+
+        // const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+        // const line = new THREE.Line(geometry,material);
+
+        // scene.add(line);
+
+        // var objLoader = new THREE.OBJLoader();
+        // objLoader.setPath('/examples/3d-obj-loader/assets/');
+        // objLoader.load('r2-d2.obj',function(object){
+        //     object.position.y -= 60;
+        //     scene.add(object);
+        // })
+
+        // renderer.render(scene, camera);
+
+        // const object = new THREE.Object3D();
+        // scene.add(object);
+        
+        import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.121.1/build/three.module.js";
+        import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/GLTFLoader.js"; 
+
+
+        let scene, camera, renderer;
+        
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xdddddd);
+
+            camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeight,1,5000); 
+
+            hlight = new THREE.AmbientLight(0x404040,100);
+            scene.add(hlight);
+
+            renderer = new THREE.WebGLRenderer({antialias:true});
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+        }
+
+        let loader = new GLTFLoader();
+        loader.load('scene.gltf',function(gltf){
+            scene.add(gltf.scene);
+            renderer.render(scene,camera);
+        });
+        init();
+    </script>
+
+    <!-- 글자 넣기 -->
+    <!-- <div id="info">Description</div> -->
+</body>
+</html>
