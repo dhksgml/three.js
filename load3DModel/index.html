@@ -3,28 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        html, body{
+        /* html, body{
             margin: 0;
             padding: 0;
             height: 100%;
-        }
-        canvas{
+        } */
+        /* canvas{
             border: 1px solid black;
             position: absolute;
             top: 50%;
             left: 50%;
             margin: -250px 0 0 -480px; 
-        }
+        } */
     </style>
 </head>
 <body>
     <!-- <script src="three.min.js"></script>
     <script src="GLTFLoader.js"></script> -->
-    <canvas>
+    
         <script type="module">
             import * as THREE from 'https://cdn.skypack.dev/three@^0.135.0';
             import threeDragcontrols from 'https://cdn.skypack.dev/three-dragcontrols';
             import {GLTFLoader} from 'https://cdn.skypack.dev/three@^0.135.0/examples/jsm/loaders/GLTFLoader.js';
+            import { OrbitControls } from 'https://cdn.skypack.dev/three@^0.135.0/examples/jsm/controls/OrbitControls.js';
             
             let scene, camera, renderer;
             
@@ -33,33 +34,40 @@
                 scene.background = new THREE.Color(0xdddddd);
 
                 camera = new THREE.PerspectiveCamera(40,window.innerWidth/window.innerHeight, 1, 5000);
-                camera.rotation.x = -15/180*Math.PI;
-                camera.position.x = 9;
-                camera.position.y = -9;
-                camera.position.z = 2;
+                // camera.rotation.y = -45/180*Math.PI;
+                // camera.position.x = 30;
+                // camera.position.y = -10;
+                // camera.position.z = 20;
+                camera.position.set(0,3,18)
 
                 renderer = new THREE.WebGLRenderer({antialias:true});
-                renderer.setSize(window.innerWidth/2, window.innerHeight/2);
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.shadowMap.enabled = true;
                 document.body.appendChild(renderer.domElement);
 
 
-                const light = new THREE.DirectionalLight(0xffffff,50);
-                light.position.set(2,2,10)
+                const light = new THREE.DirectionalLight(0xffffff,3);
+                light.position.set(2,2,2)
                 scene.add(light);
 
-                const light1 = new THREE.PointLight(0xffffff,1,100);
-                light1.position.set(-10,-11,10)
+                const light1 = new THREE.SpotLight(0xff0000);
+                light1.position.set(-10,-10,10);
+                light1.rotation.y = -45;
+                light1.castShadow = true;
+                // const spotLightHelper = new THREE.SpotLightHelper(light1)
                 scene.add(light1);
 
+                let car;
 
                 let loader = new GLTFLoader();
                 loader.load('images/scene.gltf',function(gltf){
                     console.log(gltf)
-                    let car = gltf.scene;
+                    car = gltf.scene;
                     // car.scale.set(0.5,0.5,0.1);
-                    car.position.x = -0.5
-                    car.position.y = -0.5
-                    car.position.z = 0
+                    // car.position.x = -0.5
+                    // car.position.y = -0.5
+                    // car.position.z = 0
+                    car.position.set(-10,11,10)
                     car.rotation.y = 180/180*Math.PI
                     scene.add(car);
                     renderer.render(scene,camera);
@@ -70,7 +78,8 @@
                 });
 
                 
-                
+                // const controls = new THREE.OrbitControls( camera, renderer.domElement );
+                // controls.addEventListner('mousedown',function(event){camera.position.x += 1},false);
 
                 // const geometry = new THREE.BoxGeometry(1,1,1)
                 // const material = new THREE.MeshBasicMaterial({
@@ -89,10 +98,24 @@
 
             }
 
+            
             init();
 
-            
+            const controls = new OrbitControls(camera, renderer.domElement);
+    
+            // camera.position.set(0,20,100);
+            controls.update();
+
+            function animate() {
+                requestAnimationFrame(animate);
+                // controls.autoRotate = true
+                controls.update()
+                renderer.render(scene,camera)
+            }
+
+            animate();
+        
         </script>
-    </canvas>
+
 </body>
 </html>
