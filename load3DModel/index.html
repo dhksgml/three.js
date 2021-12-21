@@ -28,6 +28,7 @@
             import { OrbitControls } from 'https://cdn.skypack.dev/three@^0.135.0/examples/jsm/controls/OrbitControls.js';
             
             let scene, camera, renderer;
+            let hlight, directionalLight;
             
             function init(){
                 scene = new THREE.Scene();
@@ -38,7 +39,7 @@
                 // camera.position.x = 30;
                 // camera.position.y = -10;
                 // camera.position.z = 20;
-                camera.position.set(0,3,18)
+                camera.position.set(0,3,50)
 
                 renderer = new THREE.WebGLRenderer({antialias:true});
                 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -46,31 +47,90 @@
                 document.body.appendChild(renderer.domElement);
 
 
-                const light = new THREE.DirectionalLight(0xffffff,3);
-                light.position.set(2,2,2)
-                scene.add(light);
+                hlight = new THREE.AmbientLight(0x404040,100);
+                scene.add(hlight);
 
-                const light1 = new THREE.SpotLight(0xff0000);
-                light1.position.set(-10,-10,10);
-                light1.rotation.y = -45;
-                light1.castShadow = true;
-                // const spotLightHelper = new THREE.SpotLightHelper(light1)
+                directionalLight = new THREE.DirectionalLight(0xffffff,50);
+                directionalLight.position.set(0,1,0);
+                directionalLight.castShadow = true;
+                scene.add(directionalLight);
+
+                const light1 = new THREE.PointLight(0xc4c4c4,10);
+                light1.position.set(-10,5,0);
                 scene.add(light1);
 
+                const light2 = new THREE.PointLight(0xc4c4c4,10);
+                light2.position.set(10,5,0);
+                scene.add(light2);
+                
+                const light3 = new THREE.PointLight(0xc4c4c4,10);
+                light3.position.set(0,10,-10);
+                scene.add(light3);
+
+                const light4 = new THREE.PointLight(0xc4c4c4,10);
+                light4.position.set(0,10,10);
+                scene.add(light4);
+
                 let car;
+
+                function dumpObject(obj, lines = [], isLast = true, prefix = "") {
+                    const localPrefix = isLast ? "└─" : "├─";
+                    lines.push(
+                        `${prefix}${prefix ? localPrefix : ""}${obj.name || "*no-name*"} [${
+                        obj.type
+                        }]`
+                    );
+                    const newPrefix = prefix + (isLast ? "  " : "│ ");
+                    const lastNdx = obj.children.length - 1;
+                    obj.children.forEach((child, ndx) => {
+                        const isLast = ndx === lastNdx;
+                        dumpObject(child, lines, isLast, newPrefix);
+                    });
+                    return lines;
+                }
 
                 let loader = new GLTFLoader();
                 loader.load('images/scene.gltf',function(gltf){
                     console.log(gltf)
+                    // gltf.parser.nodeNamesUsed.Cube001 = false;
+                    // gltf.parser.nodeNamesUsed.RootNode = false;
+                    // gltf.parser.nodeNamesUsed.Cylinder007_tire_0 = false;
+                    // gltf.parser.nodeNamesUsed.Cylinder007_tire_0_1 = false;
+                    // console.log(gltf.scene.children[0].children[0].children[0].children[0].children[5])
+                    // gltf.scene.children[0].children[0].children[0].children[0].children[5].rotation.z -= 40;
+                    // console.log(gltf.scene.children[0].children[0].children[0].children[0].children[5])
+                    // gltf.scene.children[0].children[0].children[0].children[0].children[0].children[0].position.z -= 10
+
+                    console.log(dumpObject(gltf.scene).join('\n'));
+                    console.log(gltf.scene.children[0].children[0].children[0].children[0].children[2].children[20])
+
+                    //왼쪽 앞 바퀴
+                    gltf.scene.children[0].children[0].children[0].children[0].children[2].children[20].rotation.z -= 400;
+
+                    //왼쪽 뒷 바퀴
+                    gltf.scene.children[0].children[0].children[0].children[0].children[2].children[1].rotation.z += 100;
+                    // gltf.scene.children[0].children[0].children[0].children[0].children[4].rotation.z -= 40
+
+                    // gltf.scene.children[0].children[0].children[0].children[0].children[5].position.y += 100
+
+
+                    //오른쪽 앞 바퀴
+                    // gltf.scene.children[0].children[0].children[0].children[0].children[6].rotation.z -= 40
+                    
+                    //오른쪽 뒷 바퀴
+                    // gltf.scene.children[0].children[0].children[0].children[0].children[1].rotation.z += 40
                     car = gltf.scene;
                     // car.scale.set(0.5,0.5,0.1);
                     // car.position.x = -0.5
                     // car.position.y = -0.5
                     // car.position.z = 0
-                    car.position.set(-10,11,10)
-                    car.rotation.y = 180/180*Math.PI
+                    car.position.set(10,11,10)
+                    // car.rotation.y = 180/180*Math.PI
                     scene.add(car);
+                    
+                    
                     renderer.render(scene,camera);
+                    
                 },function(xhr){
                     console.log((xhr.loaded/xhr.total * 100)+"% loaded")
                 },function(error){
