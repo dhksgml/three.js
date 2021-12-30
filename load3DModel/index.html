@@ -35,18 +35,25 @@
             let degree = 0;
             let left_dir = 0, right_dir = 0;
             let car;
-            let uVec = new THREE.Vector3(0,0,1).normalize();
+            let l_tire_angle = 0;
+            let r_tire_angle = 0;
+
+            // let uVec = new THREE.Vector3(0,0,1).normalize();
+
+            let carDegree = Math.PI;
+            let myDegree = 0;
+            let tireDegree = Math.PI;
             
             function init(){
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color(0xdddddd);
 
-                camera = new THREE.PerspectiveCamera(40,window.innerWidth/window.innerHeight, 1, 5000);
-                // camera.rotation.y = -45/180*Math.PI;
+                camera = new THREE.PerspectiveCamera(10,window.innerWidth/window.innerHeight, 1, 5000);
+                camera.rotation.x = 1/180*Math.PI;
                 // camera.position.x = 30;
                 // camera.position.y = -10;
                 // camera.position.z = 20;
-                camera.position.set(0,2,10)
+                camera.position.set(0,0,-50)
 
                 renderer = new THREE.WebGLRenderer({antialias:true});
                 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -115,6 +122,7 @@
                     //오른쪽 앞 바퀴
                     gltf.scene.children[0].children[0].children[0].children[0].children[6].rotation.z += r_tire_rotation;
                     
+                    
 
                     // gltf.scene.children[0].children[0].children[0].children[0].children[6].position.x += 100;
 
@@ -132,15 +140,21 @@
                     gltf.scene.children[0].children[0].children[0].children[0].children[3].children[0].visible = false;
                     
 
-                    car = gltf.scene;
-                    car.rotation.y += 180/180*Math.PI;
+                    const model = gltf.scene;
+                    model.rotation.y += 180/180*Math.PI;
                     // car.position.set(0,0,0)
 
                     //박스를 생성하여 모델을 중앙을 기준으로 회전 적용 
-                    var box = new THREE.Box3().setFromObject(car)
+                    var box = new THREE.Box3().setFromObject(model)
                     var center = new THREE.Vector3();
+
                     box.getCenter(center);
-                    car.position.sub(center);
+                    car = new THREE.Object3D();
+                    
+                    car.position.set(center.x, 9, center.z);
+
+                    car.add(model);
+                    //car.position.sub(center);
                     scene.add(car);
                     
 
@@ -177,19 +191,28 @@
                     //바퀴 방향 전환
                     if(e.keyCode===37){ 
                         rs += 0.1;
+                        l_tire_angle += 0.1;
+                        r_tire_angle -= 0.1;
                         // degree -= 10;
-                        left_dir = 1;
-                        if(car.children[0].children[0].children[0].children[0].children[2].children[20].rotation.z >= 0.5){ rs = 0.5}
-                        car.children[0].children[0].children[0].children[0].children[2].children[20].rotation.z = rs;
-                        car.children[0].children[0].children[0].children[0].children[6].rotation.z = rs;
+                        // left_dir = 1;
+                        //if(car.children[0].children[0].children[0].children[0].children[2].children[20].rotation.z >= 0.5){ rs = 0.5; }
+                        if(l_tire_angle >= 0.5){l_tire_angle = 0.5; rs = 0.5;}
+                        if(r_tire_angle <= -0.5){r_tire_angle = -0.5;}
+                        
+                        car.children[0].children[0].children[0].children[0].children[0].children[2].children[20].rotation.z = rs;
+                        car.children[0].children[0].children[0].children[0].children[0].children[6].rotation.z = rs;
                     }
                     if(e.keyCode===39){ 
                         rs -= 0.1;
+                        l_tire_angle -= 0.1;
+                        r_tire_angle += 0.1;
                         // degree += 10;
-                        right_dir = 1;
-                        if(car.children[0].children[0].children[0].children[0].children[2].children[20].rotation.z <= -0.5){ rs = -0.5}
-                        car.children[0].children[0].children[0].children[0].children[2].children[20].rotation.z = rs;
-                        car.children[0].children[0].children[0].children[0].children[6].rotation.z = rs;
+                        // right_dir = 1;
+                        //if(car.children[0].children[0].children[0].children[0].children[2].children[20].rotation.z <= -0.5){ rs = -0.5; }
+                        if(l_tire_angle <= -0.5){l_tire_angle = -0.5; rs = -0.5;}
+                        if(r_tire_angle >= 0.5){r_tire_angle = 0.5;}
+                        car.children[0].children[0].children[0].children[0].children[0].children[2].children[20].rotation.z = rs;
+                        car.children[0].children[0].children[0].children[0].children[0].children[6].rotation.z = rs;
                     }
 
                     //전진 후진
@@ -213,60 +236,65 @@
                         // car.position.sub(center);
                         // scene.add(car);
 
-                        
-                        
+                        //console.log(rs);
                         //회전?
-                        if(left_dir){
+                        
+                        
+                        if(l_tire_angle > r_tire_angle){
+                            degree = 10 * l_tire_angle;
+                            degree = (degree / 180) * Math.PI;
                             
-                            degree += 10 * rs;
-                            degree = degree / 180 * Math.PI;
-                            // console.log(degree)
-                            car.rotation.y += degree * rs
-                            car.rotation.y += 0.01;
-
-
-                            // car.matrixAutoUpdate = false;
-                            // const m = new THREE.Matrix4();
-                            // m.set( car.matrix.elements );
-                            // m.makeRotationY(degree)
-                            // console.log(car.matrix.elements)
+                            myDegree += degree;
+                            carDegree += degree;
+                            // console.log(`carD: ${carDegree}, tireD: ${tireDegree}`);
+                            // carDegree += tireDegree;
                         }
+                        else if(l_tire_angle < r_tire_angle){
+                            degree = 10 * r_tire_angle;
+                            degree = (degree / 180) * Math.PI;
+                            
+                            myDegree -= degree;
+                            carDegree -= degree;
 
-                        if(right_dir){
-                            degree -= 10 * rs;
-                            degree = degree / 180 * Math.PI;
-                            console.log(degree)
-                            car.rotation.y += degree * rs
-                            // car.rotation.y -= 0.01;
+                            car.position.x += Math.sin(myDegree)*1.5;
+                            car.position.z += Math.cos(myDegree)*1.5;
+                        }
+                        else{
+                            car.position.x += Math.sin(myDegree);
+                            car.position.z += Math.cos(myDegree);
                         }
                         
-                        
-                        car.position.x += Math.sin(degree * rs) * speed;
-                        car.position.z -= Math.cos(degree * rs) * speed;
+                        // car.position.x += Math.sin(myDegree);
+                        // car.position.z += Math.cos(myDegree);
 
+                        // console.log(carDegree);
                     }
                     if(e.keyCode===40){
-                        
 
-                        if(left_dir){
-                            degree -= 10;
-                            degree = degree / 180 * Math.PI;
-                            console.log(degree)
-                            car.rotation.y += degree * rs
-                            // car.rotation.y += 0.01;
+                        if(l_tire_angle > r_tire_angle){
+                            degree = 10 * l_tire_angle;
+                            degree = (degree / 180) * Math.PI;
+                            
+                            myDegree -= degree;
+                            carDegree -= degree;
+                            // console.log(`carD: ${carDegree}, tireD: ${tireDegree}`);
+                            // carDegree += tireDegree;
                         }
+                        else if(l_tire_angle < r_tire_angle){
+                            degree = 10 * r_tire_angle;
+                            degree = (degree / 180) * Math.PI;
+                            
+                            myDegree += degree;
+                            carDegree += degree;
 
-                        if(right_dir){
-                            degree += 10;
-                            degree = degree / 180 * Math.PI;
-                            console.log(degree)
-                            car.rotation.y -= degree * rs
-                            // car.rotation.y -= 0.01;
+                            car.position.x -= Math.sin(myDegree)*1.5;
+                            car.position.z -= Math.cos(myDegree)*1.5;
+                        }
+                        else{
+                            car.position.x -= Math.sin(myDegree);
+                            car.position.z -= Math.cos(myDegree);
                         }
                         
-                        
-                        car.position.x -= Math.sin(degree * rs) * speed;
-                        car.position.z += Math.cos(degree * rs) * speed;
 
                     }
                 });
@@ -294,10 +322,9 @@
             // controls.update();
 
             function animate() {
-                
-
                 requestAnimationFrame(animate);
                 
+                car.rotation.y = carDegree;
                 // controls.autoRotate = true
                 controls.update()
                 renderer.render(scene,camera)
