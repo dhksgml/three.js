@@ -29,6 +29,13 @@
             
             let scene, camera, renderer;
             let hlight, directionalLight;
+            let l_tire_rotation = 0.2, r_tire_rotation = 0.3;
+            let rs = 0.1;
+            let speed = 1;
+            let degree = 0;
+            let left_dir = 0, right_dir = 0;
+            let car;
+            let uVec = new THREE.Vector3(0,0,1).normalize();
             
             function init(){
                 scene = new THREE.Scene();
@@ -39,7 +46,7 @@
                 // camera.position.x = 30;
                 // camera.position.y = -10;
                 // camera.position.z = 20;
-                camera.position.set(0,3,50)
+                camera.position.set(0,2,10)
 
                 renderer = new THREE.WebGLRenderer({antialias:true});
                 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -71,7 +78,6 @@
                 light4.position.set(0,10,10);
                 scene.add(light4);
 
-                let car;
 
                 function dumpObject(obj, lines = [], isLast = true, prefix = "") {
                     const localPrefix = isLast ? "└─" : "├─";
@@ -105,30 +111,40 @@
                     console.log(gltf.scene.children[0].children[0].children[0].children[0].children[2].children[20])
 
                     //왼쪽 앞 바퀴
-                    gltf.scene.children[0].children[0].children[0].children[0].children[2].children[20].rotation.z -= 400;
+                    gltf.scene.children[0].children[0].children[0].children[0].children[2].children[20].rotation.z += l_tire_rotation;
+                    //오른쪽 앞 바퀴
+                    gltf.scene.children[0].children[0].children[0].children[0].children[6].rotation.z += r_tire_rotation;
+                    
+
+                    // gltf.scene.children[0].children[0].children[0].children[0].children[6].position.x += 100;
 
                     //왼쪽 뒷 바퀴
-                    gltf.scene.children[0].children[0].children[0].children[0].children[2].children[1].rotation.z += 100;
+                    // gltf.scene.children[0].children[0].children[0].children[0].children[2].children[1].rotation.z += 0;
                     // gltf.scene.children[0].children[0].children[0].children[0].children[4].rotation.z -= 40
 
                     // gltf.scene.children[0].children[0].children[0].children[0].children[5].position.y += 100
-
-
-                    //오른쪽 앞 바퀴
-                    // gltf.scene.children[0].children[0].children[0].children[0].children[6].rotation.z -= 40
                     
                     //오른쪽 뒷 바퀴
                     // gltf.scene.children[0].children[0].children[0].children[0].children[1].rotation.z += 40
+
+
+                    // console.log(gltf.scene.children[0].children[0].children[0].children[0].children[3].children[0])
+                    gltf.scene.children[0].children[0].children[0].children[0].children[3].children[0].visible = false;
+                    
+
                     car = gltf.scene;
-                    // car.scale.set(0.5,0.5,0.1);
-                    // car.position.x = -0.5
-                    // car.position.y = -0.5
-                    // car.position.z = 0
-                    car.position.set(10,11,10)
-                    // car.rotation.y = 180/180*Math.PI
+                    car.rotation.y += 180/180*Math.PI;
+                    // car.position.set(0,0,0)
+
+                    //박스를 생성하여 모델을 중앙을 기준으로 회전 적용 
+                    var box = new THREE.Box3().setFromObject(car)
+                    var center = new THREE.Vector3();
+                    box.getCenter(center);
+                    car.position.sub(center);
                     scene.add(car);
                     
-                    
+
+                    //자동차에 박스를 하나 생성하여 자동차 기준으로 원점을 설정해 줘야함.
                     renderer.render(scene,camera);
                     
                 },function(xhr){
@@ -156,6 +172,117 @@
                 // controls.addEventListener('dragstart',function(event){});
                 // controls.removeEventListener('dragend',function(event){});
 
+                document.addEventListener("keydown",function(e){ 
+                    
+                    //바퀴 방향 전환
+                    if(e.keyCode===37){ 
+                        rs += 0.1;
+                        // degree -= 10;
+                        left_dir = 1;
+                        if(car.children[0].children[0].children[0].children[0].children[2].children[20].rotation.z >= 0.5){ rs = 0.5}
+                        car.children[0].children[0].children[0].children[0].children[2].children[20].rotation.z = rs;
+                        car.children[0].children[0].children[0].children[0].children[6].rotation.z = rs;
+                    }
+                    if(e.keyCode===39){ 
+                        rs -= 0.1;
+                        // degree += 10;
+                        right_dir = 1;
+                        if(car.children[0].children[0].children[0].children[0].children[2].children[20].rotation.z <= -0.5){ rs = -0.5}
+                        car.children[0].children[0].children[0].children[0].children[2].children[20].rotation.z = rs;
+                        car.children[0].children[0].children[0].children[0].children[6].rotation.z = rs;
+                    }
+
+                    //전진 후진
+                    if(e.keyCode===38){
+                        // console.log(car)
+                        // if(dir != 0){
+                        //     car.position.sub(new THREE.Vector3())
+                        //     car.rotation.y += dir * 0.1;
+                        // }
+                        
+                        // car.position.z -= speed;
+                        
+                        // var box = new THREE.Box3().setFromObject(car)
+                        // var center = new THREE.Vector3();
+                        // box.getCenter(center);
+                        // car.position.sub(center);
+                        // scene.add(car);
+                        // var box = new THREE.Box3().setFromObject(car)
+                        // var center = new THREE.Vector3();
+                        // box.getCenter(center);
+                        // car.position.sub(center);
+                        // scene.add(car);
+
+                        
+                        
+                        //회전?
+                        if(left_dir){
+                            
+                            degree += 10 * rs;
+                            degree = degree / 180 * Math.PI;
+                            // console.log(degree)
+                            car.rotation.y += degree * rs
+                            car.rotation.y += 0.01;
+
+
+                            // car.matrixAutoUpdate = false;
+                            // const m = new THREE.Matrix4();
+                            // m.set( car.matrix.elements );
+                            // m.makeRotationY(degree)
+                            // console.log(car.matrix.elements)
+                        }
+
+                        if(right_dir){
+                            degree -= 10 * rs;
+                            degree = degree / 180 * Math.PI;
+                            console.log(degree)
+                            car.rotation.y += degree * rs
+                            // car.rotation.y -= 0.01;
+                        }
+                        
+                        
+                        car.position.x += Math.sin(degree * rs) * speed;
+                        car.position.z -= Math.cos(degree * rs) * speed;
+
+                    }
+                    if(e.keyCode===40){
+                        
+
+                        if(left_dir){
+                            degree -= 10;
+                            degree = degree / 180 * Math.PI;
+                            console.log(degree)
+                            car.rotation.y += degree * rs
+                            // car.rotation.y += 0.01;
+                        }
+
+                        if(right_dir){
+                            degree += 10;
+                            degree = degree / 180 * Math.PI;
+                            console.log(degree)
+                            car.rotation.y -= degree * rs
+                            // car.rotation.y -= 0.01;
+                        }
+                        
+                        
+                        car.position.x -= Math.sin(degree * rs) * speed;
+                        car.position.z += Math.cos(degree * rs) * speed;
+
+                    }
+                });
+
+                document.addEventListener("keyup",function(e){ 
+                    //바퀴 방향 전환
+                    if(e.keyCode===37){ 
+                        left_dir = 0;
+                    }
+                    if(e.keyCode===39){ 
+                        right_dir = 0;
+                    }
+
+                });
+                
+
             }
 
             
@@ -164,10 +291,13 @@
             const controls = new OrbitControls(camera, renderer.domElement);
     
             // camera.position.set(0,20,100);
-            controls.update();
+            // controls.update();
 
             function animate() {
+                
+
                 requestAnimationFrame(animate);
+                
                 // controls.autoRotate = true
                 controls.update()
                 renderer.render(scene,camera)
