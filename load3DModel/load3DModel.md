@@ -36,8 +36,6 @@
 ---
 + 카메라 변경 기능 추가 -> 1번과 2번으로 변경 가능
 + 가끔 후진 시 멈추는 버그 수정 -> l_tire_angle과 r_tire_angle의 값이 소수점으로 너무 커져서 발생한 것으로 판단됨.
-  - ``` l_tire_angle = parseFloat(l_tire_angle.toFixed(1))
-        r_tire_angle = parseFloat(r_tire_angle.toFixed(1))```
-        를 통해 소수점 자리를 제한함.
+  - ```l_tire_angle = parseFloat(l_tire_angle.toFixed(1))\nr_tire_angle = parseFloat(r_tire_angle.toFixed(1))```를 통해 소수점 자리를 제한함.
 + 후진을 THREE.JS에 있는 ```Object3D.translateZ()``` 사용 -> 회전이 좀 더 자연스럽게 느껴짐.
 + 2번 카메라는 자동차를 따라다니는 카메라로, ```camera2.lookAt( car.position );```을 통해 카메라가 오브젝트를 바라보도록 한다.
